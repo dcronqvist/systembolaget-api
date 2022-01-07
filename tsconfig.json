@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ES2015",
     "module": "commonjs",
-    "target": "es6",
-    "rootDir": "./",
-    "esModuleInterop": true
-  }
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Recommended"
 }
