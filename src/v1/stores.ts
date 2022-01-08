@@ -33,6 +33,6 @@ export const v1GetStores: Endpoint = {
       }
     }
 
-    res.send(sysData?.stores)
+    res.send(sysData?.stores.map(store => store.siteId))
   }
 }
