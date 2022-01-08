@@ -1,6 +1,6 @@
 # systembolaget-api
 
-A public REST API for retrieving information about Systembolaget's products, and which products that are available in which store
+A public REST API for retrieving information about Systembolaget's products, and which products that are available in which store.
 
 ## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
 
@@ -9,6 +9,8 @@ That is correct, they no longer provide an official API for getting product info
 Its product search endpoint is this: `https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch`, but it requires an API key to be used, which can be found in all requests in the network traffic, `cfc702aed3094c86b92d6d4ff7a54c84` :).
 
 I start by getting all stores through their official API for store information, and using those, I lookup all products that exist in each store by supplying a `storeId` parameter to their product search endpoint. Unfortunately they've restricted the amount of products per page that they return to 30, so I've had to make about ~60 requests for each of the 450 stores to get all the products. Data is recollected on a weekly basis.
+
+Data that was collected the first week of 2022 is available in [data](/data), feel free to play around with it!
 
 ### `GET /products` 
 Allows for retrieving information about all products in Systembolaget's assortment. Supplying no parameters returns all products.
@@ -27,3 +29,7 @@ Allows for retrieving information about all stores that Systembolaget has, toget
 - `city: string`, returns all stores in the given city, e.g. `malmö`. (not case-sensitive).
 - `lat: float, lng: float`, returns the closest store to the given coordinates. e.g `lat=57.68751&lng=11.9785` would give the store located at Kapellplatsen in Gothenburg (calculates distance using the great-circle distance).
 - `lat: float, lng: float, maxdist: number`, returns all stores within a radius of `maxdist` kilometers from the given coordinates.
+
+## Suggestions or want to contribute?
+
+Feel free to make an issue or open a PR with new stuff! 
