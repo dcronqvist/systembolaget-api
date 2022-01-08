@@ -22,6 +22,7 @@
   },
   "scripts": {
     "dev": "source env && nodemon --ignore 'data/*' src/app.ts",
-    "dev --force-data": "source env && nodemon --ignore 'data/*' src/app.ts --force-data"
+    "dev --force-data": "source env && nodemon --ignore 'data/*' src/app.ts --force-data",
+    "start": "ts-node src/app.ts"
   }
 }
