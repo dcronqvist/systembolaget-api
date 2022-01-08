@@ -6,7 +6,7 @@ Available at
 
 | version | url |
 |---------|-----|
-|   `v1`  | [`https://systembolaget.dcronqvist.se`](https://systembolaget.dcronqvist.se)    |
+|   `v1`  | [`https://systembolaget.dcronqvist.se/v1`](https://systembolaget.dcronqvist.se/v1)    |
 
 ## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
 
