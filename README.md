@@ -2,6 +2,12 @@
 
 A public REST API for retrieving information about Systembolaget's products, and which products that are available in which store.
 
+Available at
+
+| version | url |
+|---------|-----|
+|   `v1`  | [`https://systembolaget.dcronqvist.se`](https://systembolaget.dcronqvist.se)    |
+
 ## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
 
 That is correct, they no longer provide an official API for getting product information, they now **only** provide an API for getting information about their stores. However, if one only spends a minute looking at the network traffic when searching for products at [systembolaget.se](https://www.systembolaget.se), you'll see that the front end uses an API to retrieve all products available in a certain store. 
