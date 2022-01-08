@@ -10,7 +10,7 @@ Available at
 
 ## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
 
-That is correct, they no longer provide an official API for getting product information, they now **only** provide an API for getting information about their stores. However, if one only spends a minute looking at the network traffic when searching for products at [systembolaget.se](https://www.systembolaget.se), you'll see that the front end uses an API to retrieve all products available in a certain store. 
+That is correct, they no longer provide an official API for getting product information, they now **only** provide an API for getting information about their stores, and their providers. However, if one only spends a minute looking at the network traffic when searching for products at [systembolaget.se](https://www.systembolaget.se), you'll see that the front end uses an API to retrieve all products available in a certain store. 
 
 Its product search endpoint is this: `https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch`, but it requires an API key to be used, which can be found in all requests in the network traffic, `cfc702aed3094c86b92d6d4ff7a54c84` :).
 
