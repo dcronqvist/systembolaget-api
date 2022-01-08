@@ -2,6 +2,14 @@
 
 A public REST API for retrieving information about Systembolaget's products, and which products that are available in which store
 
+## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
+
+That is correct, they no longer provide an official API for getting product information, they now **only** provide an API for getting information about their stores. However, if one only spends a minute looking at the network traffic when searching for products at [systembolaget.se](https://www.systembolaget.se), you'll see that the front end uses an API to retrieve all products available in a certain store. 
+
+Its product search endpoint is this: `https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch`, but it requires an API key to be used, which can be found in all requests in the network traffic, `cfc702aed3094c86b92d6d4ff7a54c84` :).
+
+I start by getting all stores through their official API for store information, and using those, I lookup all products that exist in each store by supplying a `storeId` parameter to their product search endpoint. Unfortunately they've restricted the amount of products per page that they return to 30, so I've had to make about ~60 requests for each of the 450 stores to get all the products. Data is recollected on a weekly basis.
+
 ### `GET /products` 
 Allows for retrieving information about all products in Systembolaget's assortment. Supplying no parameters returns all products.
 
