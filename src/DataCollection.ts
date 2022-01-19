@@ -44,7 +44,8 @@ export type Product = {
   customCategoryTitle: string,
   assortmentText: string,
   usage: string,
-  taste: string
+  taste: string,
+  images: string[]
 }
 
 export type SystemetData = {
@@ -82,6 +83,7 @@ const mapAPIProductToProduct = (product: any): Product => {
     assortmentText: product.assortmentText,
     usage: product.usage,
     taste: product.taste,
+    images: product.images.map((x: any) => `${x.imageUrl}.png`)
   }
 }
 
@@ -195,7 +197,40 @@ const getAllProducts = async (): Promise<Product[]> => {
 
 }
 
-export const getSystemetData = async (renew: boolean): Promise<SystemetData> => {
+export const getSystemetData = async (renew: boolean, devmode: boolean): Promise<SystemetData> => {
+  if (devmode) {
+    return await getStores().then(async stores => {
+      for (let i = 0; i < 2; i++) {
+        console.log("Getting products for store", stores[i].siteId)
+        const store = stores[i];
+        const products = await getProductsInStore(store.siteId)
+        store.products = products
+      }
+
+      console.log("Getting all products...")
+
+      let allProducts: Product[] = []
+      for (let i = 0; i < 2; i++) {
+        const store = stores[i];
+
+        for (let j = 0; j < store.products!.length; j++) {
+          const prod = store.products![j];
+          if (!allProducts.find(p => p.productId === prod.productId)) {
+            allProducts = allProducts.concat(prod)
+          }
+        }
+      }
+
+      console.log("Done!")
+
+      return {
+        stores: stores,
+        products: allProducts
+      }
+    })
+  }
+
+
   if (renew) {
     return await getStores().then(async stores => {
       for (let i = 0; i < stores.length; i++) {

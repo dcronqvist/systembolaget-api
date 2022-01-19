@@ -24,18 +24,40 @@ const endpoints: Endpoint[] = [
 ]
 
 const storesFile = `${process.env.PWD}/data/stores/2520.json` // the last store file
-
 let sysData: SystemetData | undefined = undefined
+let startTime: Date = new Date()
 
-const getSystemetDataFiles = (renew: boolean) => {
-  getSystemetData(renew).then(data => {
+const getDevMode = () => {
+  return process.env.DEV_MODE === 'true'
+}
+
+if (getDevMode()) {
+  console.log("Running in dev mode")
+}
+
+const getSystemetDataFiles = async (renew: boolean) => {
+  return getSystemetData(renew, getDevMode()).then(data => {
     sysData = data
     console.log("Data loaded")
   })
 }
 
-const sysDataScheduler = new CronJob('0 0 * * 0', () => getSystemetData(true), () => console.log("Finished renewing data."), true, 'Europe/Stockholm');
+const doError = (res: express.Response, code: number, message: string) => {
+  res.status(code).send({
+    error: message
+  })
+}
+
+const sysDataScheduler = new CronJob('0 0 * * 0', () => getSystemetData(true, getDevMode()), () => console.log("Finished renewing data."), true, 'Europe/Stockholm');
 sysDataScheduler.start()
+
+app.use((req, res, next) => {
+  if (!sysData) {
+    doError(res, 503, `API has recently been updated (${startTime.toUTCString()}), data is still being collected and loaded. Please wait and try again later.`)
+  }
+
+  next()
+})
 
 endpoints.forEach(endpoint => {
   app.get(endpoint.path, (req, res) => {
@@ -46,6 +68,7 @@ endpoints.forEach(endpoint => {
 
 app.listen(port, () => {
   console.log(`Running on port ${port}.`);
+
   if (!fs.existsSync(storesFile)) {
     console.log("No stores file found, creating one.")
     getSystemetDataFiles(true)
@@ -58,4 +81,4 @@ app.listen(port, () => {
       getSystemetDataFiles(false)
     }
   }
-});
+})
