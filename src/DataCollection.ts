@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios"
-import fs from "fs"
+import { updateProduct, updateStore } from "./Database"
 
 export type Store = {
   siteId: string,
@@ -13,7 +13,8 @@ export type Store = {
   county: string,
   latitude: number,
   longitude: number,
-  products: Product[] | undefined,
+  products: string[] | undefined,
+  latestUpdated: string
 }
 
 export type Product = {
@@ -46,6 +47,7 @@ export type Product = {
   usage: string,
   taste: string,
   images: string[]
+  latestUpdated: string
 }
 
 export type SystemetData = {
@@ -83,7 +85,8 @@ const mapAPIProductToProduct = (product: any): Product => {
     assortmentText: product.assortmentText,
     usage: product.usage,
     taste: product.taste,
-    images: product.images.map((x: any) => `${x.imageUrl}.png`)
+    images: product.images.map((x: any) => `${x.imageUrl}.png`),
+    latestUpdated: new Date().toISOString()
   }
 }
 
@@ -110,6 +113,7 @@ const getStores = (): Promise<Store[]> => {
         latitude: store.position.latitude,
         longitude: store.position.longitude,
         products: undefined,
+        latestUpdated: new Date().toISOString()
       }
     })
   }).catch(err => {
@@ -138,9 +142,14 @@ const getFromUrl = async (url: string): Promise<AxiosResponse> => {
 
 const getProductsFromUrl = async (url: string): Promise<Product[]> => {
   return getFromUrl(url).then(res => {
-    return res?.data.products.map((product: any) => {
-      return mapAPIProductToProduct(product)
-    })
+    try {
+      return res?.data.products.map((product: any) => {
+        return mapAPIProductToProduct(product)
+      })
+    }
+    catch (error) {
+      console.log("Failed to retrieve products from url: " + url + ", " + error)
+    }
   })
 }
 
@@ -171,8 +180,14 @@ const getProductsInStore = async (storeId: string): Promise<Product[]> => {
     for (let page = 1; page < pages; page++) {
       console.log("Getting page", page, "of", pages, "for store", storeId)
       const prods = await getProductsOnStorePage(storeId, page)
+
+      prods.filter(p => !allStoreProds.includes(p)).forEach(async p => {
+        updateProduct(p.productId, p)
+      })
+
       allStoreProds = allStoreProds.concat(prods)
     }
+
     return allStoreProds
   })
 }
@@ -197,106 +212,33 @@ const getAllProducts = async (): Promise<Product[]> => {
 
 }
 
-export const getSystemetData = async (renew: boolean, devmode: boolean): Promise<SystemetData> => {
+export const getSystemetData = async (renew: boolean, devmode: boolean): Promise<void> => {
   if (devmode) {
     return await getStores().then(async stores => {
       for (let i = 0; i < 2; i++) {
         console.log("Getting products for store", stores[i].siteId)
         const store = stores[i];
         const products = await getProductsInStore(store.siteId)
-        store.products = products
-      }
+        store.products = products.map(p => p.productId)
 
-      console.log("Getting all products...")
-
-      let allProducts: Product[] = []
-      for (let i = 0; i < 2; i++) {
-        const store = stores[i];
-
-        for (let j = 0; j < store.products!.length; j++) {
-          const prod = store.products![j];
-          if (!allProducts.find(p => p.productId === prod.productId)) {
-            allProducts = allProducts.concat(prod)
-          }
-        }
+        updateStore(stores[i].siteId, store)
       }
 
       console.log("Done!")
-
-      return {
-        stores: stores,
-        products: allProducts
-      }
     })
   }
-
-
   if (renew) {
     return await getStores().then(async stores => {
       for (let i = 0; i < stores.length; i++) {
         console.log("Getting products for store", stores[i].siteId)
         const store = stores[i];
         const products = await getProductsInStore(store.siteId)
-        store.products = products
+        store.products = products.map(p => p.productId)
 
-        fs.writeFile(`${process.env.PWD}/data/stores/${store.siteId}.json`, JSON.stringify(store), {
-          encoding: 'utf8',
-        }, (err) => {
-          if (err) {
-            console.log("Failed to write store", store.siteId, err)
-          } else {
-            console.log("Wrote store", store.siteId)
-          }
-        })
-      }
-
-      console.log("Getting all products...")
-
-      let allProducts: Product[] = []
-      for (let i = 0; i < stores.length; i++) {
-        const store = stores[i];
-
-        for (let j = 0; j < store.products!.length; j++) {
-          const prod = store.products![j];
-          if (!allProducts.find(p => p.productId === prod.productId)) {
-            allProducts = allProducts.concat(prod)
-          }
-        }
+        updateStore(stores[i].siteId, store)
       }
 
       console.log("Done!")
-
-      return {
-        stores: stores,
-        products: allProducts
-      }
     })
-  } else {
-    const files = fs.readdirSync(`${process.env.PWD}/data/stores`).filter(f => f.endsWith(".json"))
-
-    const stores: Store[] = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const storeId = file.split(".")[0]
-      const store = JSON.parse(fs.readFileSync(`${process.env.PWD}/data/stores/${file}`, 'utf8'))
-      stores.push(store)
-    }
-
-    let allProducts: Product[] = []
-    for (let i = 0; i < stores.length; i++) {
-      const store = stores[i];
-
-      for (let j = 0; j < store.products!.length; j++) {
-        const prod = store.products![j];
-        if (!allProducts.find(p => p.productId === prod.productId)) {
-          allProducts = allProducts.concat(prod)
-        }
-      }
-    }
-
-    return {
-      stores: stores,
-      products: allProducts
-    }
   }
 }

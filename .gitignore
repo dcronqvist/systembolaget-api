@@ -1,6 +1,7 @@
 .vscode/
 env
-data
+
+data/**/*.json
 
 # Logs
 logs
