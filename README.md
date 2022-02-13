@@ -4,9 +4,9 @@ A public REST API for retrieving information about Systembolaget's products, and
 
 Available at
 
-| version | url |
-|---------|-----|
-|   `v1`  | [`https://systembolaget.dcronqvist.se/v1`](https://systembolaget.dcronqvist.se/v1)    |
+| version | url | status |
+|---------|-----|--------|
+|   `v1`  | [`https://systembolaget.dcronqvist.se/v1`](https://systembolaget.dcronqvist.se/v1) | ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m790628189-3889d7a6a87b8ed97014b563) |
 
 ## But Systembolaget has [removed their API for retrieving products](https://api-portal.systembolaget.se/api-update-blog/changes-in-the-api-portal), so how does this work?
 
