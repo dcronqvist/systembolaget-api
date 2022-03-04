@@ -2,7 +2,11 @@
 
 A public REST API for retrieving information about Systembolaget's products, and which products that are available in which store.
 
-Available at
+# 🔔 NOTE
+
+### **Currently in communication with Systembolaget about whether this API breaks their terms and conditions, and the API is therefore not available at this time.**
+
+----
 
 | version | url | status |
 |---------|-----|--------|
